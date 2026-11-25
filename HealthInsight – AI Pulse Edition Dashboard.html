@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HealthInsight – AI Pulse Edition</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f3faf6;--card:#fff;--line:#cfe5da;--tx:#0b2a20;--mut:#4d6b5f;--ac:#12a37a;--gold:#c58a00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#06211b;--card:#0f3a30;--line:#1d5a4a;--tx:#eafff6;--mut:#9cc7b8;--ac:#6ee7b7;--gold:#f5c04f}}
+:root[data-theme="dark"]{--bg:#06211b;--card:#0f3a30;--line:#1d5a4a;--tx:#eafff6;--mut:#9cc7b8;--ac:#6ee7b7;--gold:#f5c04f}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;line-height:1.45}
+.w{max-width:1180px;margin:0 auto;padding:24px 16px 48px}
+header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:20px}
+.k{color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.08em}
+h1{margin:4px 0;font-size:clamp(26px,5vw,40px);color:var(--ac)}
+.sub{color:var(--mut);font-size:14px}
+button{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:13px}
+button.on{background:var(--ac);color:#06211b;border-color:var(--ac)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi b{display:block;font-size:26px;color:var(--ac)}.kpi span{font-size:12px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+@media(max-width:420px){.grid{grid-template-columns:1fr}}
+.card h2{margin:0 0 2px;font-size:16px}.card .t{font-size:12px;color:var(--mut);margin-bottom:8px}
+.ch{position:relative;height:240px}
+.ins{font-size:13px;margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line)}.ins b{color:var(--gold)}
+.tb{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.hm{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px;min-width:300px}
+td,th{padding:10px 6px;text-align:center;border:2px solid var(--card)}th{color:var(--mut);font-weight:600}
+.note{margin-top:20px;font-size:12px;color:var(--mut)}
+</style></head><body><div class="w">
+<header><div><div class="k">DATA PRACTICAL SCIENCE | SIYA · 2501060166 · BCA (AI &amp; DS), D</div>
+<h1>HealthInsight – AI Pulse Edition</h1><div class="sub">Healthcare admissions analytics dashboard</div></div>
+<button id="th">Toggle theme</button></header>
+<div class="kpis">
+<div class="kpi"><b>55,500</b><span>Raw records</span></div>
+<div class="kpi"><b>54,860</b><span>Cleaned records</span></div>
+<div class="kpi"><b>534</b><span>Duplicates removed</span></div>
+<div class="kpi"><b>106</b><span>Negative bills removed</span></div>
+<div class="kpi"><b>$28,513</b><span>Highest avg bill (under 18)</span></div>
+<div class="kpi"><b>4,777</b><span>Peak month (August)</span></div></div>
+<div class="grid">
+<div class="card"><h2>Records by medical condition</h2><div class="t">Horizontal bar</div><div class="ch"><canvas id="c1"></canvas></div><p class="ins"><b>Insight:</b> Arthritis leads (9,207), Asthma is lowest (9,077) – only a 130 gap.</p></div>
+<div class="card"><h2>Monthly admissions profile</h2><div class="t">Area chart</div><div class="ch"><canvas id="c2"></canvas></div><p class="ins"><b>Insight:</b> Range 4,199 (Feb) to 4,777 (Aug). Mid-year months run highest.</p></div>
+<div class="card"><h2>Share of test results</h2><div class="t">Pie</div><div class="ch"><canvas id="c3"></canvas></div><p class="ins"><b>Insight:</b> Abnormal 33.5%, Normal 33.4%, Inconclusive 33.1% – almost equal.</p></div>
+<div class="card"><h2>Average billing by age group</h2><div class="t">Line</div><div class="ch"><canvas id="c4"></canvas></div><p class="ins"><b>Insight:</b> Under-18 average is highest; other groups stay between $25,348 and $25,681.</p></div>
+<div class="card"><h2>Monthly admissions by type</h2><div class="t">Multi-line · click to filter</div><div class="tb" id="tf"></div><div class="ch"><canvas id="c5"></canvas></div><p class="ins"><b>Insight:</b> Urgent swings most (1,339 in Feb to 1,634 in Aug); all types follow a similar pattern.</p></div>
+<div class="card"><h2>Emergency admissions by condition</h2><div class="t">Radar</div><div class="ch"><canvas id="c6"></canvas></div><p class="ins"><b>Insight:</b> 2,970 (Hypertension) to 3,092 (Obesity). Axis starts at 2,900, which exaggerates a ~4% gap.</p></div>
+<div class="card"><h2>Quarterly admissions 2021–2023</h2><div class="t">Grouped columns</div><div class="ch"><canvas id="c7"></canvas></div><p class="ins"><b>Insight:</b> Range 2,658–2,790. Q3 2022 is the top quarter; Q3 is strong in 2022 and 2023.</p></div>
+<div class="card"><h2>Records by medication</h2><div class="t">Lollipop</div><div class="ch"><canvas id="c8"></canvas></div><p class="ins"><b>Insight:</b> Lipitor 11,018 vs Penicillin 10,932 – under 90 records apart.</p></div>
+<div class="card"><h2>Condition × admission type</h2><div class="t">Heat map (record counts)</div><div class="hm"><table id="hm"></table></div><p class="ins"><b>Insight:</b> 2,970 (Hypertension, Emergency) to 3,188 (Diabetes, Urgent). The spread is even.</p></div>
+<div class="card"><h2>Insurance provider share</h2><div class="t">Doughnut</div><div class="ch"><canvas id="c10"></canvas></div><p class="ins"><b>Insight:</b> Cigna 20.3% is largest, Aetna 19.7% smallest – all near one fifth.</p></div>
+</div>
+<div class="card" style="margin-top:14px"><h2>Key findings &amp; responsible use</h2>
+<p class="ins" style="border:0;margin:6px 0 0">Records are spread almost evenly across conditions, test results, medications, insurers and admission types. Charts show patterns, not cause and effect. The dataset looks randomly generated, so it cannot represent real hospital behaviour; real patient data needs consent, privacy and access controls.</p></div>
+<p class="note">Source: healthcare dataset CSV (54,860 cleaned records), for academic demonstration. Exact values come from the slides; monthly-by-type, monthly total and quarterly series were read from the chart images and are approximate.</p>
+</div>
+<script>
+const R=document.documentElement;
+function cv(n){return getComputedStyle(R).getPropertyValue(n).trim()}
+const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const P=['#6ee7b7','#f5c04f','#7aa7ff','#c4b0e4','#2fa58a','#ff9f7a'];
+let charts=[];
+function build(){
+charts.forEach(c=>c.destroy());charts=[];
+const tx=cv('--mut'),ln=cv('--line');Chart.defaults.color=tx;Chart.defaults.borderColor=ln;
+const base={responsive:true,maintainAspectRatio:false};
+const sc=(o={})=>({x:{grid:{color:ln}},y:{grid:{color:ln},...o}});
+const mk=(id,cfg)=>charts.push(new Chart(document.getElementById(id),cfg));
+mk('c1',{type:'bar',data:{labels:['Arthritis','Diabetes','Hypertension','Obesity','Cancer','Asthma'],datasets:[{data:[9207,9197,9131,9127,9121,9077],backgroundColor:P[0]}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:0,grid:{color:ln}},y:{grid:{display:false}}}}});
+mk('c2',{type:'line',data:{labels:M,datasets:[{data:[4650,4199,4610,4468,4550,4640,4762,4777,4505,4605,4502,4605],borderColor:P[0],backgroundColor:P[0]+'55',fill:true,tension:.25}]},options:{...base,plugins:{legend:{display:false}},scales:sc({min:3800,max:5000})}});
+mk('c3',{type:'pie',data:{labels:['Abnormal','Normal','Inconclusive'],datasets:[{data:[33.5,33.4,33.1],backgroundColor:[P[0],P[1],P[4]],borderColor:cv('--card')}]},options:{...base,plugins:{tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}}});
+mk('c4',{type:'line',data:{labels:['<18','18-34','35-49','50-64','65-79','80+'],datasets:[{data:[28513,25624,25599,25681,25541,25348],borderColor:P[0],backgroundColor:P[0],pointRadius:5}]},options:{...base,plugins:{legend:{display:false}},scales:sc({min:25000,max:29000})}});
+const T={Elective:[1552,1412,1509,1511,1566,1562,1603,1612,1484,1554,1505,1567],Emergency:[1545,1448,1523,1468,1529,1480,1572,1531,1499,1489,1461,1525],Urgent:[1546,1339,1578,1487,1452,1598,1587,1634,1520,1562,1535,1512]};
+mk('c5',{type:'line',data:{labels:M,datasets:Object.keys(T).map((k,i)=>({label:k,data:T[k],borderColor:[P[0],P[1],P[2]][i],backgroundColor:[P[0],P[1],P[2]][i],tension:.2,hidden:!sel.has(k)}))},options:{...base,scales:sc()}});
+mk('c6',{type:'radar',data:{labels:['Arthritis','Asthma','Cancer','Diabetes','Hypertension','Obesity'],datasets:[{data:[3070,2973,2983,2982,2970,3092],borderColor:P[0],backgroundColor:P[0]+'44'}]},options:{...base,plugins:{legend:{display:false}},scales:{r:{min:2900,max:3100,grid:{color:ln},angleLines:{color:ln},ticks:{backdropColor:'transparent'}}}}});
+mk('c7',{type:'bar',data:{labels:['Q1','Q2','Q3','Q4'],datasets:[{label:'2021',data:[2695,2666,2709,2725],backgroundColor:P[4]},{label:'2022',data:[2658,2709,2790,2734],backgroundColor:P[0]},{label:'2023',data:[2705,2760,2787,2666],backgroundColor:P[1]}]},options:{...base,scales:sc({min:2500})}});
+const med=[['Lipitor',11018],['Ibuprofen',11002],['Aspirin',10963],['Paracetamol',10945],['Penicillin',10932]];
+mk('c8',{type:'bar',data:{labels:med.map(m=>m[0]),datasets:[{type:'bar',data:med.map(m=>m[1]),backgroundColor:P[0],barThickness:3},{type:'line',data:med.map(m=>m[1]),showLine:false,pointRadius:8,backgroundColor:P[1],borderColor:P[1]}]},options:{...base,plugins:{legend:{display:false}},scales:sc({min:0})}});
+mk('c10',{type:'doughnut',data:{labels:['Cigna','Medicare','UnitedHealthcare','Blue Cross','Aetna'],datasets:[{data:[20.3,20.1,20.0,19.9,19.7],backgroundColor:[P[0],P[1],P[4],P[2],P[3]],borderColor:cv('--card')}]},options:{...base,cutout:'55%',plugins:{tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}}});
+}
+const sel=new Set(['Elective','Emergency','Urgent']);
+const tf=document.getElementById('tf');
+['Elective','Emergency','Urgent'].forEach(k=>{const b=document.createElement('button');b.textContent=k;b.className='on';b.onclick=()=>{sel.has(k)?sel.delete(k):sel.add(k);b.classList.toggle('on');charts[4].data.datasets.forEach(d=>d.hidden=!sel.has(d.label));charts[4].update()};tf.appendChild(b)});
+const H=[['Arthritis',3058,3070,3079],['Asthma',3064,2973,3040],['Cancer',3108,2983,3030],['Diabetes',3027,2982,3188],['Hypertension',3171,2970,2990],['Obesity',3009,3092,3026]];
+document.getElementById('hm').innerHTML='<tr><th></th><th>Elective</th><th>Emergency</th><th>Urgent</th></tr>'+H.map(r=>'<tr><th style="text-align:left">'+r[0]+'</th>'+r.slice(1).map(v=>{const t=(v-2970)/218;return '<td style="background:hsl('+(180+t*120)+',90%,'+(60-t*10)+'%);color:#06211b">'+v.toLocaleString()+'</td>'}).join('')+'</tr>').join('');
+document.getElementById('th').onclick=()=>{const d=getComputedStyle(R).getPropertyValue('--bg').trim()==='#06211b';R.setAttribute('data-theme',d?'light':'dark');build()};
+build();
+</script></body></html>
